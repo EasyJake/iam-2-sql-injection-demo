@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hash Handling Example</title>
+    <style>
+        .unauthorized {
+            color: red;
+            font-weight: bold;
+        }
+        .error {
+            color: orange;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to the Hash Handling Example</h1>
+
+    <script>
+        if(document.location.hash === '#unauthorized') {
+            document.write('<div class="unauthorized">Invalid Username or Password</div>');
+        } else if(document.location.hash === '#error') {
+            document.write('<div class="error">An error has occurred</div>');
+        }
+    </script>
+</body>
+</html>
