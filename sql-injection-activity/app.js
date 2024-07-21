@@ -1,13 +1,12 @@
+const sqlite3 = require('sqlite3').verbose();
 const http = require('http');
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
-const sqlite3 = require('sqlite3').verbose();
 
-// Create an instance of express
 const app = express();
 
-// Middleware to serve static files from the current directory
+// Serve static files from the current directory
 app.use(express.static('.'));
 
 // Middleware to parse URL-encoded bodies
@@ -18,19 +17,18 @@ app.use(bodyParser.json());
 
 // SQLite setup
 const db = new sqlite3.Database(':memory:');
-
 db.serialize(function () {
     db.run("CREATE TABLE user (username TEXT, password TEXT, title TEXT)");
     db.run("INSERT INTO user VALUES ('privilegedUser', 'privilegedUser1', 'Administrator')");
 });
 
 // GET route to send the HTML file
-app.get('/', (req, res) => {
+app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // POST route to handle login form submission
-app.post('/login', (req, res) => {
+app.post('/login', function (req, res) {
     const username = req.body.username;
     const password = req.body.password;
 
@@ -41,21 +39,20 @@ app.post('/login', (req, res) => {
     console.log(`Password: ${password}`);
     console.log(`Query: ${query}`);
 
-    db.get(query, (err, row) => {
+    db.get(query, function (err, row) {
         if (err) {
-            res.redirect('/#error');
-        } else if (row) {
-            res.send(`<h1>Welcome, ${row.title}</h1>`);
+            console.log('ERROR:', err);
+            res.redirect('/index.html#error');
+        } else if (!row) {
+            res.redirect('/index.html#unauthorized');
         } else {
-            res.redirect('/#unauthorized');
+            res.send(`Hello <b>${row.title}</b>!<br /> This file contains all your secret data: <br /><br /> SECRETS <br /><br /> MORE SECRETS <br /><br /> <a href="/index.html">Go back to login</a>`);
         }
     });
 });
 
 // Start the server on port 3000
-const server = http.createServer(app);
 const PORT = 3000;
-
-server.listen(PORT, () => {
+app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
